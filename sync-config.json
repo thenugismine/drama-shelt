@@ -1,5 +1,6 @@
 {
-  "endpoint": "",
+  "collectionCsv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRKwC6VRzfgv9ia1kbF1YXfoA1dW_Fiqmv9mKGXPxWYkcQrNGVnvObdYCvncdxMogq7pikFGDoSORZ_/pub?gid=0&single=true&output=csv",
+  "reviewsCsv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRKwC6VRzfgv9ia1kbF1YXfoA1dW_Fiqmv9mKGXPxWYkcQrNGVnvObdYCvncdxMogq7pikFGDoSORZ_/pub?gid=7310420&single=true&output=csv",
   "refreshSeconds": 60,
-  "status": "Awaiting Google deployment authorization"
+  "mode": "read-only"
 }
