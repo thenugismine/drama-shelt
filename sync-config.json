@@ -1,0 +1,5 @@
+{
+  "endpoint": "",
+  "refreshSeconds": 60,
+  "status": "Awaiting Google deployment authorization"
+}

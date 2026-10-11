@@ -1,48 +1,42 @@
-# After the Credits
+# After the Credits — Cinematic Shelf
 
-A Cinematic Shelf website for Chishimba’s drama ratings and reviews. The website is `index.html`, with the initial collection embedded and poster images beside it. It needs no build step, paid hosting, database, or API key.
+Chishimba’s drama diary, hosted on GitHub Pages at https://thenugismine.github.io/drama-shelt/.
 
-## View the website
+## Collection and artwork
 
-Open `index.html` in a browser. Search the collection, filter viewing statuses, browse favorites and movies, and open any title to see its rating and review. Reviews have individual shareable links after the site is hosted. Spoiler reviews remain hidden until a reader chooses to reveal them.
+The current collection contains 230 dramas and 30 movies imported from K Dramas. Original letter grades, extra plus signs, movie thumbs, favorite order, and duplicate-entry histories are preserved. Scores out of ten and written reviews start blank.
 
-## Publish on GitHub Pages
+229 dramas have TVmaze poster links. Matches are recorded in `poster-matches.json`; alternative English titles and Korean/Chinese language were checked. `Love Sprout` is deliberately left unmatched because its exact title is unclear. Seasons listed separately use the show’s series artwork. Movie posters can be added through the owner workspace. Posters belong to the respective rights holders; TVmaze supplies matching metadata and links.
 
-1. Create a public repository, for example `drama-shelt`, in your GitHub account.
-2. Upload `index.html`, all six `drama-*.jpg` poster files, and `.nojekyll` to the repository root and commit them on `main`.
-3. In the repository, open **Settings → Pages**. Under **Build and deployment**, select **Deploy from a branch**, select `main`, choose `/ (root)`, and save.
-4. GitHub Pages displays the website address after deployment completes. For a repository named `drama-shelt` under `thenugismine`, the expected address is `https://thenugismine.github.io/drama-shelt/`. This is an expected address, not a verified live deployment.
+`index.html` contains a last-known collection snapshot, so the site can remain usable when the sheet service is unavailable. `collection.json` is the corresponding data backup.
 
-## Add dramas, rate them, and write reviews
+## Permanent Google Sheet syncing
 
-1. Open the website and choose **My workspace**.
-2. Use **Add drama or movie**, or open a title and choose **Rate & review**.
-3. Enter your grade, an optional score from 0 to 10, viewing status, review, and spoiler flag. Favorite titles appear in your favorites collection. You can provide an HTTPS poster URL for new titles; titles without posters use a typography cover.
-4. **Save draft on this device** keeps your changes in this browser. The public collection remains the version in the hosted file. Browser storage is local to a device and browser; it does not sync to Google Sheets or other devices.
-5. Choose **Download website**. Upload the downloaded `index.html` to the same repository root, replacing the existing file. Commit the change. GitHub Pages will publish the new ratings and reviews.
-6. Choose **Back up collection** to save a JSON backup. **Restore backup** loads a backup into your local workspace. Take a backup before changing devices or clearing browser storage.
+**Status: prepared; activation awaits Google deployment authorization.**
 
-The workspace is a local editor, not an authenticated administration area. Visitors can only change their own browser drafts. A repository write is required to change the published collection. The website never stores GitHub tokens or accesses your Google account.
+The bound Google Apps Script project contains the backend and owner editor. Source is archived in `google-sheet-sync.zip` as `sync/Code.gs` and `sync/Editor.html`. Deployment must execute as the owner. Public requests return only the drama collection; every editor and save request checks that the active Google account equals the deploying owner. An anonymous account or a different account cannot save. No owner credential or API key is included in this repository.
 
-## Import details
+`Sheet1` remains the source for drama and movie grades, watchlist entries, and favorites. The additional **Website Reviews** tab holds stable IDs, display titles, scores, reviews, spoiler flags, poster URLs, country, source-title mapping, and creation dates. Sheet1’s actual native layout is A:B dramas/ratings, C favorites, D watchlist, E:F movies/ratings. The CSV export adds a synthetic index column that is not present in the native sheet.
 
-Imported from the current K Dramas spreadsheet on October 11, 2026:
+Once authorized and deployed:
 
-- 227 drama rows with titles and 31 movie rows.
-- 230 unique dramas including watchlist-only titles, and 30 unique movies.
-- All 15 favorite titles are preserved.
-- Five duplicate-title histories are retained. The last sheet entry supplies the displayed grade and status. Open a duplicate title to see its original entries.
-- One grade (`A`) has no title in the source. It is preserved in the collection backup under `importNotes.blankTitleRatings` rather than assigned to a guessed title.
-- Grades are preserved. A-plus strings and movie thumbs have not been converted into numerical scores. Scores and written reviews begin empty.
-- A few clear title spelling errors are corrected for display; the original spreadsheet titles remain in each entry’s `sourceEntries`.
-- The Google spreadsheet is unchanged. This version is an imported snapshot, not live synchronization.
+1. Save the deployed Google `/exec` URL as `endpoint` in `sync-config.json`.
+2. The site reads the sheet on page load, every minute while visible, and when you return to the tab. Connection failures show the last saved collection and a visible status.
+3. **My workspace → Rate & review** opens the owner editor on Google. Saves persist to the original grade cell and Website Reviews. A revision check rejects stale saves if an entry changed after it was loaded. New titles append to the relevant sheet columns while preserving neighboring movie/drama data.
+4. Visitors can browse and share reviews without signing in. Editing requires the deploying owner’s Google account.
 
-`collection.json` is an initial editable backup. The website’s source of published data is the embedded `collection-data` block in `index.html`; replacing the JSON file alone does not update the website.
+Do not enable an anonymous owner-executed deployment without checking the owner guard. Do not change `owner_()` to use the effective identity alone: every public request executes under that identity. The active identity must be nonblank and match it.
 
-## Artwork
+Google’s spreadsheet authorization can permit access to spreadsheets generally. The code opens one fixed spreadsheet and exposes only collection fields. Review Google’s authorization screen before granting access.
 
-The site includes downloaded promotional posters for Pursuit of Jade, Crash Landing on You, Coffee Prince, Goblin, Moonlight Drawn by Clouds, and Her Private Life. Each has a source link in the site’s **Artwork credits** dialog. Other titles use typography covers. Promotional artwork belongs to its respective rights holders.
+## Editing while activation is pending
+
+The site clearly shows that syncing is pending. Its existing local workspace still stores drafts in that browser only; those drafts are not sheet saves. Download a backup before clearing browser storage. After sync activation, the live sheet is authoritative; migrate any local drafts intentionally rather than overwriting sheet entries automatically.
+
+## GitHub Pages
+
+Publish the main branch from the repository root. The site is static; it needs no npm dependencies or build step. Retain `.nojekyll`, `index.html`, `sync-config.json`, `poster-matches.json`, and the six original `drama-*.jpg` files in the root. The original Pursuit of Jade image remains the hero image.
 
 ## Validation
 
-Data migration was checked against the spreadsheet: all titled drama and movie entries, original grades, statuses, duplicate histories, favorites, and the untitled grade were retained. JavaScript syntax and collection validation, filtering, sorting, new-entry creation, review escaping, and local draft/public separation were checked. A browser-based visual and interaction check was not available in this environment.
+Backend checks cover collection counts, all 15 favorites, latest duplicate ratings, score/review persistence, conflict rejection, owner-only writes, safe appends, and moving a watchlist title to Watching. Poster links are audited as decodable images. Activation still needs an end-to-end live sheet-to-site and owner-save test after Google authorization.
